@@ -1,0 +1,1136 @@
+/***********************************************************************************************************************
+* Version      : BAS25(STEP_UP)
+* File Name    : Main.c
+* Device(s)    : R5F100MG
+* Creation Date: 2015/07/31
+* Copyright    : Coway_Electronics Engineering Team (DH,Kim)
+* Description  :
+***********************************************************************************************************************/
+#include    "Macrodriver.h"
+#include    "Global_Variable.h"
+#include    "Port_Define.h"
+#include    "AC_motor_output.h"
+
+void output_ac_motor(void);
+void check_error_micro_sw_detect_at_once(void);
+void check_error_micro_sw_movement(void);
+void output_ice_feeder_motor(void);
+void output_ice_tray_motor(void);
+void check_error_tray_motor_cw_operation(void);
+void check_error_tray_motor_ccw_retry_operation(void);
+void ice_make_system_up_move_reset(void);
+void ice_make_system_down_move_reset(void);
+
+void over_ice_making_check(void);
+void over_ice_making_melt_proc(void);
+void ice_system_reset(void);
+void ice_system_stop(void);
+
+void inverse_direction_time_check(void);
+void reset_micro_sw_move_err_check_state(void);
+void down_tray_motor(void);
+void up_tray_motor(void);
+void check_ice_system_ok(void);
+
+////
+
+//----------------------------------------------------// Motor
+U8 gu8Reverse;
+U8 gu8TrayCWInterval;
+U8 gu8TrayCCWInterval;
+U8 gu8DualTrayStep;
+U8 gu8DualTrayCheckCNT;
+U16 gu16DualCheckDelay;
+U8 gu8_Err_Tray_Up_Count;
+U8 gu8_Err_Tray_Down_Count;
+
+/*..hui [19-12-13오후 7:12:16] 트레이 탈빙 이동 누적 에러 카운트..*/
+U8 gu8_err_tray_down_acc_count;
+
+
+U8 gu8_Tray_Interval_Timer;
+
+
+U8 gu8_Tray_CW_Interval_Timer;
+bit F_Tray_CW_delay_finish;
+
+
+
+
+U8 gu8_Tray_CCW_Interval_Timer;
+bit F_Tray_CCW_delay_finish;
+
+
+U8 u8_Tray_up_moving_retry_timer;
+
+
+U8 u8_Tray_down_moving_retry_timer;
+
+
+
+
+U8 u8Trayretry1;
+
+
+bit F_ErrTrayMotor_DualInital;
+U16 gu16ErrTrayMotor;
+
+
+U16 gu16_Err_Tray_Motor_Down_Total_Tmr;
+U16 gu16_Err_Tray_Motor_Up_Total_Tmr;
+
+
+
+U16 gu16_Ice_Tray_Up_Reset_Delay_Tmr;
+
+U16 gu16_Ice_Tray_Down_Reset_Delay_Tmr;
+
+U8 gu8_Tray_Motor_Direction;
+
+U8 gu8_Pre_Tray_Motor_Direction;
+bit F_Ice_Tray_Up_Move_Reset;
+
+bit F_Ice_Tray_Down_Move_Reset;
+
+bit F_over_ice_check_enable;
+
+
+U16 gu16_over_ice_melt_timer;
+
+U8 gu8_over_ice_melt_proc;
+
+U8 gu8_over_ice_melt_operation_count;
+
+
+bit F_Over_Ice_Heater_State;
+
+bit bit_ice_out_back_state;
+U8 gu8_ice_out_reverse_timer;
+
+U8 gu8_ice_out_operation_timer;
+bit bit_ice_full_state;
+
+U8 gu8_ice_system_ok;
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void output_ac_motor(void)
+{
+    /*ac_motor_time_check();*/
+    output_ice_feeder_motor();
+    output_ice_tray_motor();
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void output_ice_feeder_motor(void)
+{
+    if(gu8IceOutCCWInterval > 0)
+    {
+        gu8IceOutCCWInterval--;    // 토출모터 대기3->2초
+    }
+    else{}
+
+    if(gu16ErrIceOut > 0)
+    {
+        gu16ErrIceOut--;                // 얼음토출 모터에러 120초
+    }
+    else{}
+
+
+/*..hui [20-4-17오후 3:04:49] 피더 역회전 넣을때 ice_extraction_finish에 F_IR 지워줘야함..꼭~~~..*/
+/*..hui [20-4-17오후 3:04:59] 만빙 감지를 2초 역회전 완료 후 하도록 하기 위해..*/
+    //===========================================// 얼음토출 모터 동작
+    if(F_IceOutCCW == SET)                      // 토출회전(역회전)
+    {
+        /*..hui [20-4-14오후 12:42:38] 3초 후 피더 추출 동작..*/
+        if(pMOTOR_ICE_OUT_CCW != SET && gu8IceOutCCWInterval == 0)
+        {
+            pMOTOR_ICE_OUT_CCW = SET;
+            gu16ErrIceOut = 1200;              //에러대기 120초
+
+            /*..hui [20-4-14오후 12:38:30] 피더스크류 역회전 추가..*/
+            /*bit_ice_out_back_state = SET;*/
+        }
+        else{}
+
+        /*..hui [20-4-14오후 12:45:16] 추출 2분 이상 지속시 강제 정지..*/
+        if(pMOTOR_ICE_OUT_CCW == SET && gu16ErrIceOut == 0)
+        {
+            pMOTOR_ICE_OUT_CCW = CLEAR;
+            F_IceOutCCW = CLEAR;
+        }
+        else{}
+
+        if( pMOTOR_ICE_OUT_CCW == SET )
+        {
+            if( bit_ice_full_state == SET )
+            {
+                gu8_ice_out_operation_timer++;
+
+                if( gu8_ice_out_operation_timer >= 60 )
+                {
+                    gu8_ice_out_operation_timer = 60;
+                    bit_ice_out_back_state = SET;
+                }
+                else{}
+            }
+            else
+            {
+                gu8_ice_out_operation_timer = 0;
+                bit_ice_out_back_state = CLEAR;
+            }
+        }
+        else
+        {
+            /*..hui [20-4-22오전 10:27:26] 추출 직전에 만빙일 경우에만 감지하도록..*/
+            if( F_IceFull == SET )
+            {
+                bit_ice_full_state = SET;
+            }
+            else
+            {
+                bit_ice_full_state = CLEAR;
+            }
+        }
+
+        /*..hui [20-4-14오후 1:09:53] 추출시 역회전 정지..*/
+        pMOTOR_ICE_OUT_CW = CLEAR;
+        gu8_ice_out_reverse_timer = 0;
+    }
+    else if( bit_ice_tank_ster_start == SET && gu8_ice_ster_mode == STER_MODE_MELT_ICE
+            && gu8_melt_ice_step == 24 )
+    {
+        /*..hui [23-10-18오전 11:27:15] 해빙작업 1차, 2차 완료 후 2초 동안 정회전..*/
+        pMOTOR_ICE_OUT_CCW = SET;
+        gu8_ice_out_reverse_timer = 0;
+        pMOTOR_ICE_OUT_CW = CLEAR;
+    }
+    else
+    {
+        pMOTOR_ICE_OUT_CCW = CLEAR;
+        bit_ice_full_state = CLEAR;
+        gu8_ice_out_operation_timer = 0;
+
+        /*..hui [20-4-14오후 12:38:42] 피더스크류가 추출 방향으로 동작을 했으면..*/
+        if( bit_ice_out_back_state == SET )
+        {
+            gu8_ice_out_reverse_timer++;
+
+            /*..hui [20-4-14오후 12:38:59] 3초동안 정/역 둘다 OFF 후 대기..*/
+            /*..hui [20-4-14오후 12:39:18] 3초 후 역회전 모터 가동 시작..*/
+            /*..hui [20-4-22오전 10:29:26] 만빙상태에서 6초이상 추출했으면 6초후 ..*/
+            if( gu8_ice_out_reverse_timer >= 60 )
+            {
+                pMOTOR_ICE_OUT_CW = SET;
+            }
+            else{}
+
+            /*..hui [20-4-14오후 12:40:01] 2초 동안 가동 후 역회전 정지..*/
+            if( gu8_ice_out_reverse_timer >= 80 )
+            {
+                pMOTOR_ICE_OUT_CW = CLEAR;
+                bit_ice_out_back_state = CLEAR;
+                gu8_ice_out_reverse_timer = 0;
+                /*..hui [20-4-22오전 10:35:40] 역회전 완료 후 만빙감지..*/
+                F_IR = SET;
+            }
+            else{}
+        }
+        else
+        {
+            pMOTOR_ICE_OUT_CW = CLEAR;
+            gu8_ice_out_reverse_timer = 0;
+        }
+    }
+
+
+
+#if 0
+    //===========================================// 얼음토출 모터 동작
+    if(F_IceOutCCW == SET)                      // 토출회전(역회전)
+    {
+        if(pMOTOR_ICE_OUT_CCW != SET && gu8IceOutCCWInterval == 0)
+        {
+            pMOTOR_ICE_OUT_CCW = SET;
+            gu16ErrIceOut = 1200;              //에러대기 120초
+        }
+        else{}
+
+        if(pMOTOR_ICE_OUT_CCW == SET && gu16ErrIceOut == 0)
+        {
+            pMOTOR_ICE_OUT_CCW = 0;
+            F_IceOutCCW = 0;
+        }
+        else{}
+    }
+    else
+    {
+        pMOTOR_ICE_OUT_CCW = 0;
+    }
+#endif
+
+
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void output_ice_tray_motor(void)
+{
+    /*..hui [18-2-9오후 1:09:49] CW CCW 방향 변경 시 5초 대기 후 전환..*/
+    inverse_direction_time_check();
+
+    if( Bit18_Tray_Micro_SW_Up_Move_Error__E62 == SET
+        || Bit19_Tray_Micro_SW_Down_Move_Error__E63 == SET
+        || Bit17_Tray_Micro_SW_Dual_Detect_Error__E61 == SET )
+    {
+        pMOTOR_ICE_TRAY_CW = CLEAR;
+        pMOTOR_ICE_TRAY_CCW = CLEAR;
+    }
+    else if(F_ErrTrayMotor_DualInital == SET)
+    {
+        check_error_micro_sw_detect_at_once();
+        /*..hui [18-2-13오후 3:16:13] move 에러 확인 중 동시감지 에러 체크로 전환시 모두 클리어..*/
+        /*..hui [18-2-13오후 3:16:29] 다시 move조건이되면 처음부터 시작하도록....*/
+        reset_micro_sw_move_err_check_state();
+    }
+    else
+    {
+        check_error_micro_sw_movement();
+        gu8DualTrayStep = 0;
+    }
+
+    check_ice_system_ok();
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void reset_micro_sw_move_err_check_state(void)
+{
+    F_Ice_Tray_Up_Move_Reset = 0;
+    F_Ice_Tray_Down_Move_Reset = 0;
+    F_Safety_Routine = 0;
+    gu16_Err_Tray_Motor_Up_Total_Tmr = 0;
+    gu16_Err_Tray_Motor_Down_Total_Tmr = 0;
+    u8_Tray_up_moving_retry_timer = 0;
+    u8_Tray_down_moving_retry_timer = 0;
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void inverse_direction_time_check(void)
+{
+    if(pMOTOR_ICE_TRAY_CW == SET)
+    {
+        gu8_Tray_CW_Interval_Timer = 0;
+        F_Tray_CW_delay_finish = CLEAR;
+    }
+    else
+    {
+        gu8_Tray_CW_Interval_Timer++;
+
+        if(gu8_Tray_CW_Interval_Timer >= 50)
+        {
+            gu8_Tray_CW_Interval_Timer = 50;
+            F_Tray_CW_delay_finish = SET;
+        }
+        else{}
+    }
+
+    if(pMOTOR_ICE_TRAY_CCW == SET)
+    {
+        gu8_Tray_CCW_Interval_Timer = 0;
+        F_Tray_CCW_delay_finish = CLEAR;
+    }
+    else
+    {
+        gu8_Tray_CCW_Interval_Timer++;
+
+        if(gu8_Tray_CCW_Interval_Timer >= 50)
+        {
+            gu8_Tray_CCW_Interval_Timer = 50;
+            F_Tray_CCW_delay_finish = SET;
+        }
+        else{}
+    }
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void check_error_micro_sw_detect_at_once(void)
+{
+    /*..hui [18-2-1오전 10:43:34] 트레이 동시 감지시 재시도 ..*/
+    if(gu16DualCheckDelay > 0)
+    {
+        gu16DualCheckDelay--;
+    }
+    else{}
+
+
+    if(F_TrayMotorPreUP == SET)
+    {
+        gu8DualTrayStep = 1;
+        F_TrayMotorPreUP = 0;
+    }
+    else{}
+
+    switch(gu8DualTrayStep)
+    {
+        case 0 :
+                /*..hui [18-2-1오전 11:19:07] 트레이 제빙 방향 이동..*/
+                pMOTOR_ICE_TRAY_CW = 1;
+                pMOTOR_ICE_TRAY_CCW = 0;
+                gu16DualCheckDelay = 150;     // 제빙 15초 이동
+                gu8DualTrayStep++;     // 1.CW
+                break;
+
+        case 1 :
+                if(gu16DualCheckDelay == 0)
+                {
+                    pMOTOR_ICE_TRAY_CW = 0;
+                    pMOTOR_ICE_TRAY_CCW = 0;
+                    gu16DualCheckDelay = 20;    // 2초 지연
+                    gu8DualTrayStep++;     // 2.제빙위치에서 정지
+                }
+                else if(gu16DualCheckDelay <= 130 && gu16DualCheckDelay >= 50)
+                {
+                    if(gu8IceLEV == 2)              // 이동중 Dual Open 해제
+                    {
+                        gu8DualTrayStep = 0;
+                        gu16DualCheckDelay = 0;
+                        gu8DualTrayCheckCNT = 0;
+                        F_ErrTrayMotor_DualInital = 0;    // Tray 인식 이동중이면 Tray M/S Error 초기발생 해제
+                        gu8IceStep = STATE_0_STANDBY;
+                        gu8InitStep = 0;
+                        F_IceInit = 1;
+                    }
+                    else{}
+                }
+
+                break;
+
+        case 2 :
+
+                if(gu16DualCheckDelay == 0)
+                {
+                    /*..hui [18-2-1오전 11:19:15] 트레이 탈빙 방향 이동..*/
+                    pMOTOR_ICE_TRAY_CW = 0;
+                    pMOTOR_ICE_TRAY_CCW = 1;
+                    gu16DualCheckDelay = 150;   // 탈빙 15초 이동
+                    gu8DualTrayStep++;          // 3.CCW
+                }
+                else{}
+
+                break;
+
+        case 3 :
+
+                if(gu16DualCheckDelay == 0)
+                {
+                    pMOTOR_ICE_TRAY_CW = 0;
+                    pMOTOR_ICE_TRAY_CCW = 0;
+                    gu16DualCheckDelay = 3000;     // 5분 지연
+                    gu8DualTrayStep++;              // 4.탈빙위치에서 정지
+                }
+                else if(gu16DualCheckDelay <= 130 && gu16DualCheckDelay >= 50)
+                {
+                    if(gu8IceLEV == 2)              // 이동중 Dual Open 해제
+                    {
+                        gu8DualTrayStep = 0;
+                        gu16DualCheckDelay = 0;
+                        gu8DualTrayCheckCNT = 0;
+                        F_ErrTrayMotor_DualInital = 0;  // Tray 인식 이동중이면 Tray M/S Error 초기발생 해제
+                        gu8IceStep = STATE_0_STANDBY;
+                        gu8InitStep = 0;
+                        F_IceInit = 1;
+                    }
+                }
+                else{}
+
+                break;
+
+        case 4 :
+
+                if(gu16DualCheckDelay == 0)
+                {
+                    gu8DualTrayStep = 0;
+                    if(++gu8DualTrayCheckCNT >= 3)
+                    {
+                        Bit17_Tray_Micro_SW_Dual_Detect_Error__E61 = SET;          // 3회 시도후 Error
+                        F_ErrTrayMotor_DualInital = 0;
+                    }
+                    else{}
+                }
+                else{}
+
+                break;
+
+        default :
+
+                pMOTOR_ICE_TRAY_CW = 0;
+                pMOTOR_ICE_TRAY_CCW = 0;
+        break;
+    }
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void check_error_micro_sw_movement(void)
+{
+    //------------------------------------------------- 얼음받이 회전
+    /*..hui [18-1-26오후 8:22:52] F_TrayMotorUP 가 제빙 F_TrayMotorCCW가 탈빙위치.. ..*/
+    /*..hui [18-1-26오후 8:23:08] F_TrayMotorUP 가 실제로는 CCW로 돈다..*/
+    gu8_Tray_Motor_Direction = (U8)(((F_TrayMotorDOWN << 1) & 0x02) |
+                                     (F_TrayMotorUP));
+
+    switch(gu8_Tray_Motor_Direction)
+    {
+        case TRAY_MOTOR_STOP:
+
+            pMOTOR_ICE_TRAY_CW = CLEAR;
+            pMOTOR_ICE_TRAY_CCW = CLEAR;
+            gu16_Err_Tray_Motor_Up_Total_Tmr = 0;
+            gu16_Err_Tray_Motor_Down_Total_Tmr = 0;
+            u8_Tray_up_moving_retry_timer = 0;
+            u8_Tray_down_moving_retry_timer = 0;
+
+            break;
+
+        case TRAY_MOTOR_CW_DIRECTION:
+
+            /*..hui [18-2-6오후 1:32:40] CCW로 돌고 5초가 아직 안지난 상태면 대기..*/
+            if(F_Tray_CCW_delay_finish == SET)
+            {
+                /*..hui [18-2-2오후 3:11:59] 제빙방향 이동중 에러 감지..*/
+                /*..hui [18-2-6오후 7:02:16] CW가 SET되는 시점은 gu8IceStep이 1일때밖에 없음, 제빙 시작할때..*/
+                check_error_tray_motor_cw_operation();
+            }
+            else
+            {
+                pMOTOR_ICE_TRAY_CW = CLEAR;
+                pMOTOR_ICE_TRAY_CCW = CLEAR;
+            }
+
+            break;
+
+
+        case TRAY_MOTOR_CCW_DIRECTION:
+
+            /*..hui [18-2-6오후 1:32:40] CCW로 돌고 5초가 아직 안지난 상태면 대기..*/
+            /*..hui [18-2-6오후 8:18:30] CCW가 SET되는 시점은 더미탈빙/제빙탈빙시....*/
+            if(F_Tray_CW_delay_finish == SET)
+            {
+                /*..hui [18-2-2오후 3:12:05] 탈빙 방향 이동중 에러 감지..*/
+                check_error_tray_motor_ccw_retry_operation();
+            }
+            else
+            {
+                pMOTOR_ICE_TRAY_CW = CLEAR;
+                pMOTOR_ICE_TRAY_CCW = CLEAR;
+            }
+
+            break;
+
+
+        default:
+
+            pMOTOR_ICE_TRAY_CW = CLEAR;
+            pMOTOR_ICE_TRAY_CCW = CLEAR;
+
+            break;
+    }
+
+    ice_make_system_up_move_reset();
+    ice_make_system_down_move_reset();
+
+    /*..hui [18-2-9오후 1:55:07] SW적으로 동시에 SET될 경우 대비용..*/
+    if(F_TrayMotorUP == SET && F_TrayMotorDOWN == SET)
+    {
+        Bit18_Tray_Micro_SW_Up_Move_Error__E62 = SET;
+    }
+    else{}
+
+    /*..hui [19-12-13오후 7:25:08] 트레이 내린 후 정상적으로 탈빙 모드까지 진입 시 누적 카운트 초기화..*/
+    if( gu8IceStep >= STATE_43_ICE_TAKE_OFF )
+    {
+        gu8_err_tray_down_acc_count = 0;
+    }
+    else{}
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void check_error_tray_motor_cw_operation(void)
+{
+    /*..hui [18-2-6오후 5:25:47] 탈빙에서 제빙 방향으로 이동 및 에러감지..*/
+    switch(gu8IceTrayLEV)
+    {
+        case ICE_TRAY_POSITION_ICE_MAKING:
+
+            /*..hui [18-2-6오후 2:14:43] 제빙 방향으로 감지시 정지..*/
+            pMOTOR_ICE_TRAY_CW = CLEAR;
+            F_TrayMotorUP = CLEAR;
+            gu16_Err_Tray_Motor_Up_Total_Tmr = 0;
+            gu8_Err_Tray_Up_Count = 0;
+            u8_Tray_up_moving_retry_timer = 0;
+
+            break;
+
+        case ICE_TRAY_POSITION_MOVING:
+
+            u8_Tray_up_moving_retry_timer = 0;
+            pMOTOR_ICE_TRAY_CW = SET;
+
+            break;
+
+        case ICE_TRAY_POSITION_ICE_THROW:
+
+            u8_Tray_up_moving_retry_timer++;
+
+            if(u8_Tray_up_moving_retry_timer <= 50)
+            {
+                pMOTOR_ICE_TRAY_CW = SET;
+            }
+            else if((u8_Tray_up_moving_retry_timer > 50) && (u8_Tray_up_moving_retry_timer <= 100))
+            {
+                pMOTOR_ICE_TRAY_CW = CLEAR;
+            }
+            else if((u8_Tray_up_moving_retry_timer > 100) && (u8_Tray_up_moving_retry_timer <= 150))
+            {
+                pMOTOR_ICE_TRAY_CW = SET;
+            }
+            else if((u8_Tray_up_moving_retry_timer > 150) && (u8_Tray_up_moving_retry_timer <= 200))
+            {
+                pMOTOR_ICE_TRAY_CW = CLEAR;
+            }
+            else if((u8_Tray_up_moving_retry_timer > 200) && (u8_Tray_up_moving_retry_timer <= 250))
+            {
+                pMOTOR_ICE_TRAY_CW = SET;
+            }
+            else
+            {
+                pMOTOR_ICE_TRAY_CW = CLEAR;
+                F_TrayMotorUP = CLEAR;
+                u8_Tray_up_moving_retry_timer = 0;
+
+                gu8_Err_Tray_Up_Count++;
+
+                /*if(gu8_Err_Tray_Up_Count >= 3)*/
+                if(gu8_Err_Tray_Up_Count >= TRAY_UP_RETRY_COUNT)
+                {
+                    Bit18_Tray_Micro_SW_Up_Move_Error__E62 = SET;
+                }
+                else
+                {
+                    /*gu8_Err_Tray_Up_Count++;*/
+                    F_Ice_Tray_Up_Move_Reset = SET;
+                    ice_system_stop();
+                }
+            }
+
+            break;
+
+        case ICE_TRAY_POSITION_ERROR:
+
+            /*..hui [18-2-6오후 4:49:15] 트레이 동시 감지시 즉시 정지..*/
+            /*..hui [18-2-6오후 4:51:07] 이쪽으로 들어올일은 없음 윗부분 동시감지 에러 부분에서 처리..*/
+            pMOTOR_ICE_TRAY_CW = CLEAR;
+            F_TrayMotorUP = CLEAR;
+            u8_Tray_up_moving_retry_timer = 0;
+
+            break;
+
+
+        default:
+
+            pMOTOR_ICE_TRAY_CW = CLEAR;
+            F_TrayMotorUP = CLEAR;
+            u8_Tray_up_moving_retry_timer = 0;
+
+            break;
+    }
+
+
+    if(pMOTOR_ICE_TRAY_CW == SET)
+    {
+        gu16_Err_Tray_Motor_Up_Total_Tmr++;
+
+        if(gu16_Err_Tray_Motor_Up_Total_Tmr >= ICETRAY_CW_TIME)
+        {
+            pMOTOR_ICE_TRAY_CW = CLEAR;
+            F_TrayMotorUP = CLEAR;
+            gu16_Err_Tray_Motor_Up_Total_Tmr = 0;
+
+            gu8_Err_Tray_Up_Count++;
+
+            /*if(gu8_Err_Tray_Up_Count >= 3)*/
+            if(gu8_Err_Tray_Up_Count >= TRAY_UP_RETRY_COUNT)
+            {
+                Bit18_Tray_Micro_SW_Up_Move_Error__E62 = SET;
+            }
+            else
+            {
+                /*gu8_Err_Tray_Up_Count++;*/
+                F_Ice_Tray_Up_Move_Reset = SET;
+                ice_system_stop();
+            }
+        }
+        else{}
+    }
+    else{}
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void check_error_tray_motor_ccw_retry_operation(void)
+{
+    /*..hui [18-2-6오후 8:26:55] 제빙에서 탈빙으로 이동 및 에러감지....*/
+    switch(gu8IceTrayLEV)
+    {
+        case ICE_TRAY_POSITION_ICE_MAKING:
+
+            /*..hui [18-2-6오후 8:27:13] 5초 이상 제빙 유지시 재 시도 기능 수행..*/
+            u8_Tray_down_moving_retry_timer++;
+
+            if(u8_Tray_down_moving_retry_timer <= 50)
+            {
+                pMOTOR_ICE_TRAY_CCW = SET;
+            }
+            else if((u8_Tray_down_moving_retry_timer > 50) && (u8_Tray_down_moving_retry_timer <= 100))
+            {
+                pMOTOR_ICE_TRAY_CCW = CLEAR;
+            }
+            else if((u8_Tray_down_moving_retry_timer > 100) && (u8_Tray_down_moving_retry_timer <= 150))
+            {
+                pMOTOR_ICE_TRAY_CCW = SET;
+            }
+            else if((u8_Tray_down_moving_retry_timer > 150) && (u8_Tray_down_moving_retry_timer <= 200))
+            {
+                pMOTOR_ICE_TRAY_CCW = CLEAR;
+            }
+            else if((u8_Tray_down_moving_retry_timer > 200) && (u8_Tray_down_moving_retry_timer <= 250))
+            {
+                pMOTOR_ICE_TRAY_CCW = SET;
+            }
+            else
+            {
+                pMOTOR_ICE_TRAY_CCW = CLEAR;
+                F_TrayMotorDOWN = CLEAR;
+                u8_Tray_down_moving_retry_timer = 0;
+
+                gu8_Err_Tray_Down_Count++;
+                gu8_err_tray_down_acc_count++;
+
+                if(gu8_Err_Tray_Down_Count >= 3 || gu8_err_tray_down_acc_count >= 10)
+                {
+                    /*Bit18_Tray_Micro_SW_Up_Move_Error__E62 = SET;*/
+                    Bit19_Tray_Micro_SW_Down_Move_Error__E63 = SET;
+                }
+                else
+                {
+                    /*gu8_Err_Tray_Down_Count++;*/
+                    F_Ice_Tray_Down_Move_Reset = SET;
+                    ice_system_stop();
+                }
+            }
+
+            break;
+
+        case ICE_TRAY_POSITION_MOVING:
+
+            u8_Tray_down_moving_retry_timer = 0;
+            pMOTOR_ICE_TRAY_CCW = SET;
+
+            break;
+
+        case ICE_TRAY_POSITION_ICE_THROW:
+
+            /*..hui [18-2-6오후 2:14:43] 제빙 방향으로 감지시 정지..*/
+            pMOTOR_ICE_TRAY_CCW = CLEAR;
+            F_TrayMotorDOWN = CLEAR;
+            gu16_Err_Tray_Motor_Down_Total_Tmr = 0;
+            gu8_Err_Tray_Down_Count = 0;
+            u8_Tray_down_moving_retry_timer = 0;
+
+            break;
+
+        case ICE_TRAY_POSITION_ERROR:
+
+            /*..hui [18-2-6오후 4:49:15] 트레이 동시 감지시 즉시 정지..*/
+            /*..hui [18-2-6오후 4:51:07] 이쪽으로 들어올일은 없음 윗부분 동시감지 에러 부분에서 처리..*/
+            pMOTOR_ICE_TRAY_CCW = CLEAR;
+            F_TrayMotorDOWN = CLEAR;
+            u8_Tray_down_moving_retry_timer = 0;
+
+            break;
+
+
+        default:
+
+            pMOTOR_ICE_TRAY_CCW = CLEAR;
+            F_TrayMotorDOWN = CLEAR;
+            u8_Tray_down_moving_retry_timer = 0;
+
+            break;
+    }
+
+
+    if(pMOTOR_ICE_TRAY_CCW == SET)
+    {
+        gu16_Err_Tray_Motor_Down_Total_Tmr++;
+
+        if(gu16_Err_Tray_Motor_Down_Total_Tmr >= ICETRAY_CCW_TIME)
+        {
+            pMOTOR_ICE_TRAY_CCW = CLEAR;
+            F_TrayMotorDOWN = CLEAR;
+            gu16_Err_Tray_Motor_Down_Total_Tmr = 0;
+
+            gu8_Err_Tray_Down_Count++;
+            gu8_err_tray_down_acc_count++;
+
+            if(gu8_Err_Tray_Down_Count >= 3 || gu8_err_tray_down_acc_count >= 10)
+            {
+                /*Bit18_Tray_Micro_SW_Up_Move_Error__E62 = SET;*/
+                Bit19_Tray_Micro_SW_Down_Move_Error__E63 = SET;
+            }
+            else
+            {
+                /*gu8_Err_Tray_Down_Count++;*/
+                F_Ice_Tray_Down_Move_Reset = SET;
+                ice_system_stop();
+            }
+        }
+        else{}
+    }
+    else{}
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void ice_make_system_up_move_reset(void)
+{
+    if(F_Ice_Tray_Up_Move_Reset == SET)
+    {
+        gu16_Ice_Tray_Up_Reset_Delay_Tmr++;
+
+        if(gu16_Ice_Tray_Up_Reset_Delay_Tmr >= TRAY_UP_RESET_DELAY_TIME)
+        {
+            ice_system_reset();
+            F_Ice_Tray_Up_Move_Reset = CLEAR;
+        }
+        else
+        {
+            /*..hui [18-2-13오후 3:24:13] 10분 대기중에 정상 복귀시 하던거 중지....*/
+            if(gu8IceTrayLEV == ICE_TRAY_POSITION_ICE_MAKING)
+            {
+                ice_system_reset();
+                F_Ice_Tray_Up_Move_Reset = CLEAR;
+            }
+            else{}
+        }
+    }
+    else
+    {
+        gu16_Ice_Tray_Up_Reset_Delay_Tmr = 0;
+    }
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void ice_make_system_down_move_reset(void)
+{
+    over_ice_making_check();
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void over_ice_making_check(void)
+{
+    F_over_ice_check_enable = F_Ice_Tray_Down_Move_Reset;
+
+    if(F_over_ice_check_enable != SET || Bit18_Tray_Micro_SW_Up_Move_Error__E62 == SET || Bit19_Tray_Micro_SW_Down_Move_Error__E63 == SET)
+    {
+        gu16_Ice_Tray_Down_Reset_Delay_Tmr = 0;
+        gu16_over_ice_melt_timer = 0;
+        gu8_over_ice_melt_proc = 0;
+        gu8_over_ice_melt_operation_count = 0;
+        //F_over_ice_melt_mode_cold_water_valve_out = CLEAR;
+        F_Over_Ice_Heater_State = CLEAR;
+    }
+    else
+    {
+        gu16_Ice_Tray_Down_Reset_Delay_Tmr++;
+
+        if(gu16_Ice_Tray_Down_Reset_Delay_Tmr >= TRAY_ERROR_STANDBY_TIME)   //10min
+        {
+            gu16_Ice_Tray_Down_Reset_Delay_Tmr = TRAY_ERROR_STANDBY_TIME;
+
+            over_ice_making_melt_proc();
+        }
+        else{}
+    }
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void over_ice_making_melt_proc(void)
+{
+    /*..hui [18-2-6오후 9:42:36] 과제빙된거 녹이는중에 언제든 트레이 정상 복귀되면 하던거 중지..*/
+    if(gu8IceTrayLEV == ICE_TRAY_POSITION_ICE_THROW)
+    {
+        ice_system_reset();
+        F_Ice_Tray_Down_Move_Reset = CLEAR;
+    }
+    else{}
+
+
+    switch(gu8_over_ice_melt_proc)
+    {
+        case 0:
+
+            gu16_over_ice_melt_timer = 0;
+            gu8_over_ice_melt_proc++;
+
+
+            break;
+
+        case 1:
+
+            /*..hui [18-2-6오후 9:16:17] 먼저 10초동안 냉수 급수밸브 ON한다..*/
+            gu16_over_ice_melt_timer++;
+
+            /*if(gu16_over_ice_melt_timer >= 100)*/
+            /*..hui [23-9-22오전 11:26:29] 15초로 늘림.. 아이콘아이스 사양..*/
+            if(gu16_over_ice_melt_timer >= 150)
+            {
+                F_IceVV = CLEAR;
+                gu16_over_ice_melt_timer = 0;
+                gu8_over_ice_melt_proc++;
+            }
+            else
+            {
+                F_IceVV = SET;
+            }
+
+            F_Over_Ice_Heater_State = CLEAR;
+
+            break;
+
+        case 2:
+
+            /*..hui [18-2-6오후 9:21:25] 냉수 입수하고 20초동안 탈빙히터를 가동한당..*/
+            gu16_over_ice_melt_timer++;
+
+            /*..hui [20-4-21오후 7:15:57] 안전을 위해 10초로 변경..*/
+            /*..hui [20-4-21오후 7:22:24] AIS30은 탈빙시 초기 OFF 부터 시작하므로 다시 15초로....*/
+            /*if(gu16_over_ice_melt_timer >= 150)*/
+            /*if(gu16_over_ice_melt_timer >= 6000)*/
+            /*..hui [23-9-22오전 11:26:49] 탈빙히터 동작 삭제.. 20분동안 대기..*/
+            if(gu16_over_ice_melt_timer >= 12000)
+            {
+                F_Over_Ice_Heater_State = CLEAR;
+                gu16_over_ice_melt_timer = 0;
+                gu8_over_ice_melt_proc++;
+            }
+            else
+            {
+                F_Over_Ice_Heater_State = SET;
+            }
+
+            break;
+
+
+        case 3:
+
+            gu16_over_ice_melt_timer = 0;
+            gu8_over_ice_melt_proc++;
+
+            F_Over_Ice_Heater_State = CLEAR;
+
+            break;
+
+        case 4:
+
+            /*..hui [18-2-6오후 9:23:11] 5초동안 냉수 급수밸브 ON..*/
+            gu16_over_ice_melt_timer++;
+
+            if(gu16_over_ice_melt_timer >= 50)
+            {
+                F_IceVV = CLEAR;
+                gu16_over_ice_melt_timer = 0;
+                gu8_over_ice_melt_proc++;
+            }
+            else
+            {
+                F_IceVV = SET;
+            }
+
+            F_Over_Ice_Heater_State = CLEAR;
+
+            break;
+
+        case 5:
+
+            /*..hui [18-2-6오후 9:23:58] 10분동안 대기..*/
+            gu16_over_ice_melt_timer++;
+
+            if(gu16_over_ice_melt_timer >= 6000)
+            {
+                /*..hui [18-2-6오후 9:25:47] 10분동안 대기후에 다시 급수밸브 5초 ON한다..*/
+                gu16_over_ice_melt_timer = 0;
+                gu8_over_ice_melt_proc = 3;
+
+                /*..hui [18-2-6오후 9:29:04] 총 9번 대략 90분동안 수행..*/
+                gu8_over_ice_melt_operation_count++;
+
+                /*..hui [18-2-6오후 9:30:30] 90분 동안 수행 후 CCW 동작 한번 더 수행..*/
+                if(gu8_over_ice_melt_operation_count >= 10)
+                {
+                    ice_system_reset();
+                    F_Ice_Tray_Down_Move_Reset = CLEAR;
+
+                    if(gu8IceTrayLEV != ICE_TRAY_POSITION_ICE_THROW)
+                    {
+                        F_TrayMotorUP = CLEAR;
+                        F_TrayMotorDOWN = SET;
+                    }
+                    else{}
+                }
+                else{}
+            }
+            else{}
+
+            F_Over_Ice_Heater_State = CLEAR;
+
+            break;
+
+        default:
+
+            gu8_over_ice_melt_proc = 0;
+            gu8_over_ice_melt_operation_count = 0;
+            gu16_over_ice_melt_timer = 0;
+
+            break;
+
+    }
+}
+
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void ice_system_reset(void)
+{
+    F_Safety_Routine = CLEAR;
+    gu8IceStep = STATE_0_STANDBY;
+    gu8InitStep = 0;
+
+    F_IceHeater = CLEAR;
+    F_IceVV = CLEAR;
+
+    /*..hui [18-3-22오전 10:04:37] CCW 방향 이동중에도 얼음이 있을수있음.. 더미탈빙 진행..생각이 짧았다....*/
+    F_IceInit = SET;
+
+#if 0
+    /*..hui [18-2-9오후 2:34:20] CCW 방향으로 이동 재시도중에는 굳이 더미탈빙 할 필요 없음..*/
+    if(F_Ice_Tray_Up_Move_Reset == SET)
+    {
+        F_IceInit = CLEAR;
+    }
+    else
+    {
+        F_IceInit = SET;
+    }
+#endif
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void ice_system_stop(void)
+{
+    F_Safety_Routine = SET;
+    //F_IceMakeGo = CLEAR;
+    //F_IceInit = CLEAR;
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void down_tray_motor(void)
+{
+    F_TrayMotorUP = CLEAR;
+    F_TrayMotorPreUP = CLEAR;
+    F_TrayMotorDOWN = SET;
+    F_TrayMotorPreDOWN = SET;
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void up_tray_motor(void)
+{
+    F_TrayMotorUP = SET;
+    F_TrayMotorPreUP = SET;
+    F_TrayMotorDOWN = CLEAR;
+    F_TrayMotorPreDOWN = CLEAR;
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+void check_ice_system_ok(void)
+{
+    if( Bit17_Tray_Micro_SW_Dual_Detect_Error__E61 == CLEAR
+        && Bit18_Tray_Micro_SW_Up_Move_Error__E62 == CLEAR
+        && Bit19_Tray_Micro_SW_Down_Move_Error__E63 == CLEAR
+        && F_Ice_Tray_Up_Move_Reset == CLEAR
+        && F_Ice_Tray_Down_Move_Reset == CLEAR
+        && F_Safety_Routine == CLEAR
+        && gu8_Err_Tray_Down_Count == 0
+        && gu8_Err_Tray_Up_Count == 0 )
+    {
+        gu8_ice_system_ok = SET;
+    }
+    else
+    {
+        gu8_ice_system_ok = CLEAR;
+    }
+}
+
+/***********************************************************************************************************************
+* Function Name: System_ini
+* Description  :
+***********************************************************************************************************************/
+
+
