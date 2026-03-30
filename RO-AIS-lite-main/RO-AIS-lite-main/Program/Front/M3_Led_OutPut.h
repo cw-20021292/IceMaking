@@ -1,0 +1,26 @@
+/***********************************************************************************************************************
+* Version      : BAS25(STEP_UP)
+* File Name    : Remote_Comm.c
+* Device(s)    : R5F100MG
+* Creation Date: 2015/07/31
+* Copyright    : Coway_Electronics Engineering Team (DH,Kim)
+* Description  :
+***********************************************************************************************************************/
+#ifndef _LED_OUTPUT_H_
+#define _LED_OUTPUT_H_
+
+
+
+
+//
+
+
+
+extern void output_ice_extraction_uv(void);
+
+
+
+
+
+
+#endif

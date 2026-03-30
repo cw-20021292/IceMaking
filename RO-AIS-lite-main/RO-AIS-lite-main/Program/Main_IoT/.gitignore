@@ -1,0 +1,9 @@
+# Debug files
+*.mtud
+DefaultBuild/
+SourceInsights/
+edit/
+Boot/DefaultBuild
+Flash/DefaultBuild
+Project_CubeSuite/DefaultBuild
+ro ais lite_IoT.si4project
