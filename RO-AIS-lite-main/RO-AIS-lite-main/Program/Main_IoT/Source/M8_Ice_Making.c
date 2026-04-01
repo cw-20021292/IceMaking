@@ -353,12 +353,12 @@ void ice_make_operation(void)
             else{}
 
             // if(gu16IceMakeTime == 0)
-            // 기술과제 시침핀 AD값 550이하로 확인되면 ok
-            if(gu16IceMakingADVal < 550)
+            // 기술과제 시침핀 AD값 550 이하로 확인되면 ok
+            if(gu16IceMakingADVal > 1000)
             {
                 gu16DetectTimer++;
-                // 5초 연속으로 감지되면 ok
-                if(gu16DetectTimer >= 50)
+                // 20초 연속으로 감지되면 ok
+                if(gu16DetectTimer >= 200)
                 {
                     gu16DetectTimer = 0;
                     gu16IceHeaterTime = calc_ice_heater_time();

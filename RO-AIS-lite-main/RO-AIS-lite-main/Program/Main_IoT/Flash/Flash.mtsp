@@ -3457,7 +3457,7 @@ cl0rle.lib
       <HexadecimalFileFormat-DefaultValue>IntelExtended</HexadecimalFileFormat-DefaultValue>
       <SplittingOfHexadecimalFile-DefaultValue>False</SplittingOfHexadecimalFile-DefaultValue>
       <IsLockedByUser>False</IsLockedByUser>
-      <TimeTagModified--0>-8586298648973082133</TimeTagModified--0>
+      <TimeTagModified--0>-8584267417424650902</TimeTagModified--0>
       <ErrorListFile-0>False</ErrorListFile-0>
       <FillingOfFreeMemorySpace-0>True</FillingOfFreeMemorySpace-0>
       <HexadecimalFile-0>True</HexadecimalFile-0>
@@ -3467,7 +3467,7 @@ cl0rle.lib
       <HexadecimalFileOutputFolder-0>%BuildModeName%</HexadecimalFileOutputFolder-0>
       <PostObjectConvertCommands-0 />
       <FillingStartAddress-0 />
-      <HexadecimalFileName-0>%ProjectName%.hex</HexadecimalFileName-0>
+      <HexadecimalFileName-0>IceMake_RO_AIS_Lite.hex</HexadecimalFileName-0>
       <OtherAdditionalOptions-0 />
       <FillingSize-0 />
       <HexadecimalFileFormat-0>IntelExtended</HexadecimalFileFormat-0>

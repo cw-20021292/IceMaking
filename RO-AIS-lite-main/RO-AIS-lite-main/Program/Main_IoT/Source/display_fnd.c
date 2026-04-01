@@ -10,7 +10,7 @@
 #include    "Global_Variable.h"
 #include    "Port_Define.h"
 #include    "display_fnd.h"
-/*.. sean [24-12-26] ½Ã°£ Ç¥½Ã À§ÇØ¼­ Wifi Çì´õÆÄÀÏ Ãß°¡..*/
+/*.. sean [24-12-26] ï¿½Ã°ï¿½ Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½Ø¼ï¿½ Wifi ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½..*/
 #include	"WIFI_Status.h"
 
 void fnd_normal_state(void);
@@ -88,6 +88,8 @@ bit bit_hour_blink_500ms;
 U8 gu8_min_setting_blink_timer;
 bit bit_min_blink_500ms;
 
+extern bit F_Safety_Routine;
+extern U16 gu16IceMakingADVal;
 /***********************************************************************************************************************
 * Function Name: System_ini
 * Description  :
@@ -176,7 +178,7 @@ void fnd_normal_state(void)
     }
     else
     {
-		/*.. sean [24-12-26] wifi°¡ ¿¬°áµÇ¾úÀ» °æ¿ì ½Ã°è Ç¥½Ã ..*/
+		/*.. sean [24-12-26] wifiï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ Ç¥ï¿½ï¿½ ..*/
 	    //else if( ( GetWifiApStatus(STATUS_AP_WIFI) != CLEAR ) || ( GetWifiApStatus(STATUS_AP_BLE) != CLEAR ) )
 	    //if( (GetWifiStatusValue(WIFI_STATUS_SERVER_CON) != CLEAR ) && ( gu8_cup_led_select == CLEAR )  )
 	    if( (GetWifiStatusValue(WIFI_STATUS_SERVER_CON) != CLEAR ) &&  (GetWifiStatusValue(WIFI_STATUS_PAIRING) == CLEAR ) 
@@ -203,48 +205,62 @@ void fnd_normal_state(void)
 	    }
 		else
 		{
-	        if( gu8Cup_level == CUP_LEVEL_HALF )
-	        {
-	            mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
-	            mu8_temporary_hundred = DISPLAY_NUM_1;
-	            mu8_temporary_ten = DISPLAY_NUM_2;
-	            mu8_temporary_one = DISPLAY_NUM_0;
-	        }
-	        else if( gu8Cup_level == CUP_LEVEL_ONE )
-	        {
-	            mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
-	            mu8_temporary_hundred = DISPLAY_NUM_2;
-	            mu8_temporary_ten = DISPLAY_NUM_5;
-	            mu8_temporary_one = DISPLAY_NUM_0;
-	        }
-	        else if(gu8Cup_level == CUP_LEVEL_TWO)
-	        {
-	            mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
-	            mu8_temporary_hundred = DISPLAY_NUM_5;
-	            mu8_temporary_ten = DISPLAY_NUM_0;
-	            mu8_temporary_one = DISPLAY_NUM_0;
-	        }
-	        else if(gu8Cup_level == CUP_LEVEL_FOUR)
-	        {
-	            mu8_temporary_thousand = DISPLAY_THOUSAND_NUM_1;
-	            mu8_temporary_hundred = DISPLAY_NUM_0;
-	            mu8_temporary_ten = DISPLAY_NUM_0;
-	            mu8_temporary_one = DISPLAY_NUM_0;
-	        }
-		    else if(gu8Cup_level == CUP_LEVEL_CONTINUE)
-		    {
-	            mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
-		        mu8_temporary_hundred = DISPLAY_NUM_CONTINUE_100;
-		        mu8_temporary_ten = DISPLAY_NUM_CONTINUE_010;
-		        mu8_temporary_one = DISPLAY_NUM_CONTINUE_001;
-		    }
-	        else /*if(gu8Cup_level == CUP_LEVEL_MY_CUP)*/
-	        {
-	            mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
-	            mu8_temporary_hundred = DISPLAY_NUM_LARGE_O;
-	            mu8_temporary_ten = DISPLAY_NUM_SMALL_n;
-	            mu8_temporary_one = DISPLAY_OFF;
-	        }
+	        // if( gu8Cup_level == CUP_LEVEL_HALF )
+	        // {
+	        //     mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
+	        //     mu8_temporary_hundred = DISPLAY_NUM_1;
+	        //     mu8_temporary_ten = DISPLAY_NUM_2;
+	        //     mu8_temporary_one = DISPLAY_NUM_0;
+	        // }
+	        // else if( gu8Cup_level == CUP_LEVEL_ONE )
+	        // {
+	        //     mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
+	        //     mu8_temporary_hundred = DISPLAY_NUM_2;
+	        //     mu8_temporary_ten = DISPLAY_NUM_5;
+	        //     mu8_temporary_one = DISPLAY_NUM_0;
+	        // }
+	        // else if(gu8Cup_level == CUP_LEVEL_TWO)
+	        // {
+	        //     mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
+	        //     mu8_temporary_hundred = DISPLAY_NUM_5;
+	        //     mu8_temporary_ten = DISPLAY_NUM_0;
+	        //     mu8_temporary_one = DISPLAY_NUM_0;
+	        // }
+	        // else if(gu8Cup_level == CUP_LEVEL_FOUR)
+	        // {
+	        //     mu8_temporary_thousand = DISPLAY_THOUSAND_NUM_1;
+	        //     mu8_temporary_hundred = DISPLAY_NUM_0;
+	        //     mu8_temporary_ten = DISPLAY_NUM_0;
+	        //     mu8_temporary_one = DISPLAY_NUM_0;
+	        // }
+		    // else if(gu8Cup_level == CUP_LEVEL_CONTINUE)
+		    // {
+	        //     mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
+		    //     mu8_temporary_hundred = DISPLAY_NUM_CONTINUE_100;
+		    //     mu8_temporary_ten = DISPLAY_NUM_CONTINUE_010;
+		    //     mu8_temporary_one = DISPLAY_NUM_CONTINUE_001;
+		    // }
+	        // else /*if(gu8Cup_level == CUP_LEVEL_MY_CUP)*/
+	        // {
+	        //     mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
+	        //     mu8_temporary_hundred = DISPLAY_NUM_LARGE_O;
+	        //     mu8_temporary_ten = DISPLAY_NUM_SMALL_n;
+	        //     mu8_temporary_one = DISPLAY_OFF;
+	        // }
+
+            // ë””ë²„ê¹… í‘œì‹œ
+            if(F_Safety_Routine == SET)
+            {
+                mu8_temporary_thousand = DISPLAY_THOUSAND_NUM_1;
+            }
+            else
+            {
+                mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
+            }
+
+            mu8_temporary_hundred = (gu16IceMakingADVal / 100);
+            mu8_temporary_ten = ((gu16IceMakingADVal % 100) / 10);
+            mu8_temporary_one = (gu16IceMakingADVal % 10);
 		}
     }
 
@@ -257,7 +273,7 @@ void fnd_normal_state(void)
 ***********************************************************************************************************************/
 void fnd_water_out(void)
 {
-	/*.. ¿¬¼Ó ¼±ÅÃ ¹× 3ÃÊ ¹öÆ° ´©¸¦¼ö ÀÖ°Ô º¯°æÇØ¼­ fnd Ãß°¡ÇØ¾ßÇÔ..*/
+	/*.. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 3ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ fnd ï¿½ß°ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½..*/
     //if( u8Extract_Continue == SET )
     if( ( u8Extract_Continue == SET ) || ( gu8Cup_level == CUP_LEVEL_CONTINUE ) )
     {
@@ -266,7 +282,7 @@ void fnd_water_out(void)
     else
     {
         #if 0
-        /*..hui [23-3-22¿ÀÈÄ 5:54:53] ¸¶ÀÌÄÅ »ç¿ë ¼³Á¤ÇÏ°í ¸¶ÀÌÄÅ ÃßÃâ½Ã ÄÅ ¸ð¾çÀ¸·Î º¯°æ..*/
+        /*..hui [23-3-22ï¿½ï¿½ï¿½ï¿½ 5:54:53] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½..*/
         if( bit_my_cup_enable == SET && gu8Cup_level == CUP_LEVEL_MY_CUP )
         {
             fnd_water_out_my_cup();
@@ -320,7 +336,7 @@ void fnd_water_out_normal(void)
         case 1:
 
             #if 0
-            /*..hui [23-2-9¿ÀÈÄ 12:28:00] ml Ç¥½Ã¿ë.. ¹°¾çÀÌ½´·Î %·Î Ç¥½Ã..*/
+            /*..hui [23-2-9ï¿½ï¿½ï¿½ï¿½ 12:28:00] ml Ç¥ï¿½Ã¿ï¿½.. ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ %ï¿½ï¿½ Ç¥ï¿½ï¿½..*/
             gu16_extract_display_timer = (U16)( (u16Efluent_Time) / gu8_extract_amount );
 
             if( 0 >= gu16Water_Extract_Timer % gu16_extract_display_timer )
@@ -887,7 +903,7 @@ void fnd_setting(void)
             else
             {
                 gu8_my_cup_finish_step = 0;
-                /*..hui [23-2-23¿ÀÈÄ 7:19:04] ¸¶ÀÌÄÅ ¼³Á¤ Áß FND¿¡´Â SEt Ç¥½Ã..*/
+                /*..hui [23-2-23ï¿½ï¿½ï¿½ï¿½ 7:19:04] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ FNDï¿½ï¿½ï¿½ï¿½ SEt Ç¥ï¿½ï¿½..*/
                 mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
                 mu8_temporary_hundred = DISPLAY_NUM_5;
                 mu8_temporary_ten = DISPLAY_NUM_LARGE_E;
@@ -900,7 +916,7 @@ void fnd_setting(void)
         gu8_my_cup_setting_step = 0;
         bit_my_cup_finish_flick = 0;
 
-        /*..hui [23-2-7¿ÀÈÄ 7:55:29] ICE OFF, Cold Temp, Eco Mode..*/
+        /*..hui [23-2-7ï¿½ï¿½ï¿½ï¿½ 7:55:29] ICE OFF, Cold Temp, Eco Mode..*/
         switch( u8SetDisplay )
         {
             case ON_OFF_DISPLAY_OFF:
@@ -1091,7 +1107,7 @@ void fnd_out( U8 mu8_direct, U8 mu8_thousand, U8 mu8_hundred, U8 mu8_ten, U8 mu8
         gu8_front_fnd_one = Fnd_Display_Data[ mu8_one ];
     }
 	
-	/*..sean [25-02-10]fnd ÈÖµµ Á¶ÀýÇÏ¿© µ¿ÀÛÇÒ ¼ö ÀÖµµ·Ï º¯°æ..*/
+	/*..sean [25-02-10]fnd ï¿½Öµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Öµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½..*/
 	if( F_dutyTest == CLEAR )
 	{
 		set_led_duty( DUTY_OUT_SEGMENT_0_0_0_1, DUTY_EXTRACT_70_PERCENT );
@@ -1243,7 +1259,7 @@ void fnd_my_cup_setting_state(void)
     U8 mu8_temporary_ten = 0;
     U8 mu8_temporary_one = 0;
 
-    /*..hui [23-2-23¿ÀÈÄ 7:19:04] ¸¶ÀÌÄÅ ¼³Á¤ Áß FND¿¡´Â SEt Ç¥½Ã..*/
+    /*..hui [23-2-23ï¿½ï¿½ï¿½ï¿½ 7:19:04] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ FNDï¿½ï¿½ï¿½ï¿½ SEt Ç¥ï¿½ï¿½..*/
     mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
     mu8_temporary_hundred = DISPLAY_NUM_5;
     mu8_temporary_ten = DISPLAY_NUM_LARGE_E;
@@ -1307,7 +1323,7 @@ void fnd_front_test_mode_(void)
         mu8_temporary_ten = DISPLAY_NUM_8;
         mu8_temporary_one = DISPLAY_NUM_8;
 #endif
-    	/*.. sean [24-12-26]ÇâÁö ±¸ºÐÇÏ±âÀ§ÇØ ÇâÁö Ç¥½Ã ..*/
+    	/*.. sean [24-12-26]ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ ..*/
         mu8_temporary_thousand = DISPLAY_THOUSAND_OFF;
         mu8_temporary_hundred = DISPLAY_NUM_LARGE_K;
         mu8_temporary_ten = DISPLAY_NUM_SMALL_o;
