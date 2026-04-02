@@ -12,7 +12,7 @@
 #include    "M8_Ice_making.h"
 #include    "Temp_Table.h"
 #include    "Ice_Make_Time_Table.h"
-
+#include    "api_debug.h"
 
 void Ice_Make_Process(void);
 //void ice_init_operation(void);
@@ -117,6 +117,7 @@ U16 U16TESTTTTT;
 
 extern U16 gu16IceMakingADVal;
 U16 gu16DetectTimer = 0;
+U8 gu8IsAdcDown = 0;
 
 /***********************************************************************************************************************
 * Function Name: System_ini
@@ -316,6 +317,7 @@ void ice_make_operation(void)
 
                     gu8IceStep = STATE_31_MAIN_ICE_MAKING;
                     gu16DetectTimer = 0;
+                    gu8IsAdcDown = 0;
                     gu8_ice_tray_reovery_time = 0;
 
                     #if 0
@@ -353,27 +355,38 @@ void ice_make_operation(void)
             else{}
 
             // if(gu16IceMakeTime == 0)
-            // 기술과제 시침핀 AD값 550 이하로 확인되면 ok
-            if(gu16IceMakingADVal > 1000)
+            // 기술과제 시침핀 AD값 990 이하로 확인되면 ok
+            if(gu16IceMakingADVal >= 990)
             {
+                dlog(SYSMOD, INFO, ("CLI Test - Ice Deteted : %d \r\n", gu16IceMakingADVal) );
                 gu16DetectTimer++;
-                // 20초 연속으로 감지되면 ok
-                if(gu16DetectTimer >= 200)
-                {
-                    gu16DetectTimer = 0;
-                    gu16IceHeaterTime = calc_ice_heater_time();
-
-                    /*F_IceHeater = SET;*/                      // Ice Heater On
-
-                    down_tray_motor();
-
-                    gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
-
-                    F_CristalIce = CLEAR;
-                }
+                gu8IsAdcDown = 1;
+                // 6분 연속으로 감지되면 ok
+                // if(gu16DetectTimer >= WORK_ADC_OK_TIME)
+                // {
+                //     gu16DetectTimer = WORK_ADC_OK_TIME;
+                //     dlog(SYSMOD, INFO, ("CLI Test - Ice Complete : %d \r\n", 2) );
+                // }
             }
             else
             {
+                if(gu16IceMakingADVal <= 200)
+                {
+                    if(gu8IsAdcDown == TRUE)
+                    {
+                        gu8IsAdcDown = FALSE;
+
+                        gu16IceHeaterTime = calc_ice_heater_time();
+
+                        /*F_IceHeater = SET;*/                      // Ice Heater On
+
+                        down_tray_motor();
+
+                        gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
+
+                        F_CristalIce = CLEAR;
+                    }
+                }
                 gu16DetectTimer = 0;
                 recovery_ice_tray();
             }

@@ -109,7 +109,7 @@ extern U32 gu32_wifi_ice_heater_time;
 
 
 #define ICE_MAKE_TIME     899                        /* �ܱ� 25'C, �ü� �µ� 25'C ���� */
-
+#define WORK_ADC_OK_TIME  1800      // 제빙 최소시간 3분 @100ms
 
 
 

@@ -614,7 +614,7 @@ void IICA0_StopCondition(void)
 * Arguments    : None
 * Return Value : None
 ***********************************************************************************************************************/
-void iica0_master_handler(void)
+void user_iica0_master_handler(void)
 {
     /* Control for communication */
     if ((0 == IICBSY0) && (gu16_iica0_tx_cnt != 0))

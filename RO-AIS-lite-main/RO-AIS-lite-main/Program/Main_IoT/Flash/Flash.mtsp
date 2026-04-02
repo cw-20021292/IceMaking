@@ -1737,6 +1737,12 @@
       <ParentItem>9b382767-65c5-4bcd-8832-6bca056e1769</ParentItem>
       <Property>58a02885-fc59-406b-b541-6ae336f6c142</Property>
     </Instance>
+    <Instance Guid="f382a827-0cda-4ba9-955c-1ddfefc4ee1e">
+      <Name>MV_Module</Name>
+      <Type>Category</Type>
+      <ParentItem>9b382767-65c5-4bcd-8832-6bca056e1769</ParentItem>
+      <Property>c6234811-ee84-4838-afb6-401b0267efd7</Property>
+    </Instance>
     <Instance Guid="28e1d23b-2717-4e83-8cc1-71659cc5aa5d">
       <Name>WifiEtc</Name>
       <Type>Category</Type>
@@ -2261,6 +2267,148 @@
       <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
       <ParentItem>0184a1ef-e5cc-4571-b392-28d8c2ea7a3d</ParentItem>
     </Instance>
+    <Instance Guid="c9261c7a-d9df-41e1-882a-4dddd47ec20f">
+      <Name>API</Name>
+      <Type>Category</Type>
+      <ParentItem>f382a827-0cda-4ba9-955c-1ddfefc4ee1e</ParentItem>
+    </Instance>
+    <Instance Guid="bdf11e6e-bb3d-40b6-8514-718f84ca4394">
+      <Name>APP</Name>
+      <Type>Category</Type>
+      <ParentItem>f382a827-0cda-4ba9-955c-1ddfefc4ee1e</ParentItem>
+    </Instance>
+    <Instance Guid="89df9b45-fed5-4964-9f67-d53afedb2090">
+      <Name>HAL</Name>
+      <Type>Category</Type>
+      <ParentItem>f382a827-0cda-4ba9-955c-1ddfefc4ee1e</ParentItem>
+    </Instance>
+    <Instance Guid="715f82fc-e144-4021-a9ae-46fe318a90ed">
+      <Name>README.md</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\README.md</RelativePath>
+      <ParentItem>f382a827-0cda-4ba9-955c-1ddfefc4ee1e</ParentItem>
+    </Instance>
+    <Instance Guid="55be0d45-fd17-4fe9-bfdc-cda5a6e8afbb">
+      <Name>api_debug.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\API\api_debug.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>c9261c7a-d9df-41e1-882a-4dddd47ec20f</ParentItem>
+      <Property>c10a3f6f-8366-4339-b11c-303dd973f7b7</Property>
+    </Instance>
+    <Instance Guid="1fe10161-491d-4831-870e-1485bdf642ae">
+      <Name>api_debug.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\API\api_debug.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>c9261c7a-d9df-41e1-882a-4dddd47ec20f</ParentItem>
+      <Property>21cb97f1-c41b-44bb-8b4b-8512e95f3c4c</Property>
+    </Instance>
+    <Instance Guid="4f99d646-1584-4429-95b2-bba50e39866e">
+      <Name>api_queue.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\API\api_queue.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>c9261c7a-d9df-41e1-882a-4dddd47ec20f</ParentItem>
+      <Property>f959a321-f80e-4a8b-9529-2ac2cf93e74d</Property>
+    </Instance>
+    <Instance Guid="e0c87109-80de-4148-8fad-da6555db2052">
+      <Name>api_queue.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\API\api_queue.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>c9261c7a-d9df-41e1-882a-4dddd47ec20f</ParentItem>
+      <Property>c90c95c4-b6c2-4030-a908-d914f2c082b6</Property>
+    </Instance>
+    <Instance Guid="d59dc681-31d0-4d1c-9a69-eee22d108a1f">
+      <Name>api_uart.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\API\api_uart.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>c9261c7a-d9df-41e1-882a-4dddd47ec20f</ParentItem>
+    </Instance>
+    <Instance Guid="86d29938-945f-41c8-9b80-544e5394b354">
+      <Name>api_uart.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\API\api_uart.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>c9261c7a-d9df-41e1-882a-4dddd47ec20f</ParentItem>
+    </Instance>
+    <Instance Guid="eb76444c-38b8-4197-94ce-5f69dbce8cdd">
+      <Name>App_Comm.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\App_Comm.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+      <Property>5685e2cd-8f9d-42d4-8efd-ef699c889231</Property>
+    </Instance>
+    <Instance Guid="8dea7f4c-9c75-4164-9fbf-294d44a606bb">
+      <Name>App_Comm.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\App_Comm.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+    </Instance>
+    <Instance Guid="c8313583-7dd6-46e9-8a4c-cd227a516875">
+      <Name>App_Comm_CLI.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\App_Comm_CLI.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+    </Instance>
+    <Instance Guid="e3fe042b-3f9b-4be7-89f1-351c197e710d">
+      <Name>App_Comm_CLI.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\App_Comm_CLI.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+    </Instance>
+    <Instance Guid="99d33771-9933-446e-9a40-7a37d332660a">
+      <Name>App_Comm_Protocol.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\App_Comm_Protocol.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+      <Property>822831a5-f454-4aa3-8069-c21cd3e7e50e</Property>
+    </Instance>
+    <Instance Guid="a9625d48-b7f6-4457-8019-e5a89c4b7562">
+      <Name>App_Comm_Protocol.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\App_Comm_Protocol.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+    </Instance>
+    <Instance Guid="be97daf1-a4f8-4af2-8577-1fbd64a9551d">
+      <Name>Packet_Match.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\Packet_Match.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+    </Instance>
+    <Instance Guid="557642b8-8e30-4272-89c8-950b28c79a7b">
+      <Name>Packet_Match.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\APP\Packet_Match.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>bdf11e6e-bb3d-40b6-8514-718f84ca4394</ParentItem>
+      <Property>80d14282-6405-49c9-ab8c-f4b164421a7a</Property>
+    </Instance>
+    <Instance Guid="69c906aa-69c6-4dd9-bd60-3961b57d3d62">
+      <Name>hal_serial.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\HAL\hal_serial.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>89df9b45-fed5-4964-9f67-d53afedb2090</ParentItem>
+      <Property>12ca8d87-2796-4357-a433-38eab0a6cf89</Property>
+    </Instance>
+    <Instance Guid="71ccd29c-5eff-4502-aa98-610b1c322231">
+      <Name>hal_serial.h</Name>
+      <Type>File</Type>
+      <RelativePath>..\Source\MV_Module\HAL\hal_serial.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>89df9b45-fed5-4964-9f67-d53afedb2090</ParentItem>
+      <Property>20bca8ed-6614-4267-b76a-ee24d7e53f3b</Property>
+    </Instance>
   </Class>
   <Class Guid="fb98844b-2c27-4275-9804-f6e63e204da0">
     <Instance Guid="2a349cb6-b982-4ade-adcd-104b883ad81c">
@@ -2712,6 +2860,33 @@
     <Instance Guid="d735aa63-6d76-4183-9726-01fdedec53f2">
       <MemoCount>0</MemoCount>
     </Instance>
+    <Instance Guid="c10a3f6f-8366-4339-b11c-303dd973f7b7">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="21cb97f1-c41b-44bb-8b4b-8512e95f3c4c">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="80d14282-6405-49c9-ab8c-f4b164421a7a">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="20bca8ed-6614-4267-b76a-ee24d7e53f3b">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="c90c95c4-b6c2-4030-a908-d914f2c082b6">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="822831a5-f454-4aa3-8069-c21cd3e7e50e">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="5685e2cd-8f9d-42d4-8efd-ef699c889231">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="12ca8d87-2796-4357-a433-38eab0a6cf89">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="f959a321-f80e-4a8b-9529-2ac2cf93e74d">
+      <MemoCount>0</MemoCount>
+    </Instance>
   </Class>
   <Class Guid="78a5c5cd-76cb-4bcc-a031-3020011fbc9a">
     <Instance Guid="3f2623aa-56d5-42b9-be85-f81bbb3070a8">
@@ -2745,6 +2920,9 @@
       <MemoCount>0</MemoCount>
     </Instance>
     <Instance Guid="c3b81ce0-e8e9-4fb9-9db3-0f679e4976a9">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="c6234811-ee84-4838-afb6-401b0267efd7">
       <MemoCount>0</MemoCount>
     </Instance>
   </Class>
@@ -3077,7 +3255,23 @@
       <SourceItemType144>CSource</SourceItemType144>
       <SourceItemGuid145>45808f1d-f80c-47e4-aaf0-37dd32d2fd6d</SourceItemGuid145>
       <SourceItemType145>CSource</SourceItemType145>
-      <SourceItemCount>146</SourceItemCount>
+      <SourceItemGuid146>55be0d45-fd17-4fe9-bfdc-cda5a6e8afbb</SourceItemGuid146>
+      <SourceItemType146>CSource</SourceItemType146>
+      <SourceItemGuid147>4f99d646-1584-4429-95b2-bba50e39866e</SourceItemGuid147>
+      <SourceItemType147>CSource</SourceItemType147>
+      <SourceItemGuid148>d59dc681-31d0-4d1c-9a69-eee22d108a1f</SourceItemGuid148>
+      <SourceItemType148>CSource</SourceItemType148>
+      <SourceItemGuid149>eb76444c-38b8-4197-94ce-5f69dbce8cdd</SourceItemGuid149>
+      <SourceItemType149>CSource</SourceItemType149>
+      <SourceItemGuid150>c8313583-7dd6-46e9-8a4c-cd227a516875</SourceItemGuid150>
+      <SourceItemType150>CSource</SourceItemType150>
+      <SourceItemGuid151>99d33771-9933-446e-9a40-7a37d332660a</SourceItemGuid151>
+      <SourceItemType151>CSource</SourceItemType151>
+      <SourceItemGuid152>be97daf1-a4f8-4af2-8577-1fbd64a9551d</SourceItemGuid152>
+      <SourceItemType152>CSource</SourceItemType152>
+      <SourceItemGuid153>69c906aa-69c6-4dd9-bd60-3961b57d3d62</SourceItemGuid153>
+      <SourceItemType153>CSource</SourceItemType153>
+      <SourceItemCount>154</SourceItemCount>
       <VfiSourceItemCount>0</VfiSourceItemCount>
       <LastDeviceChangedCounter>2</LastDeviceChangedCounter>
     </Instance>
@@ -3201,8 +3395,11 @@ cl0rle.lib
       <NumberOfLinesPerPage-DefaultValue>0</NumberOfLinesPerPage-DefaultValue>
       <TabWidth-DefaultValue>8</TabWidth-DefaultValue>
       <IsLockedByUser>False</IsLockedByUser>
-      <TimeTagModified--0>-8584726310497268384</TimeTagModified--0>
-      <AdditionalIncludePaths-0>..\Code_Generator
+      <TimeTagModified--0>-8584264971790879875</TimeTagModified--0>
+      <AdditionalIncludePaths-0>..\Source\MV_Module\HAL
+..\Source\MV_Module\APP
+..\Source\MV_Module\API
+..\Code_Generator
 ..\Source\Wifi\WifiUserConfig\WifiServerProtocolList
 ..\Source\Wifi\WifiUserConfig
 ..\Source\Wifi\WifiTx
@@ -4678,6 +4875,74 @@ cl0rle.lib
       <ItemAddTime>638696136005634733</ItemAddTime>
       <ItemAddTimeCount>1</ItemAddTimeCount>
     </Instance>
+    <Instance Guid="715f82fc-e144-4021-a9ae-46fe318a90ed">
+      <ItemAddTime>639107389063665928</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="55be0d45-fd17-4fe9-bfdc-cda5a6e8afbb">
+      <ItemAddTime>639107389063765933</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="1fe10161-491d-4831-870e-1485bdf642ae">
+      <ItemAddTime>639107389063765933</ItemAddTime>
+      <ItemAddTimeCount>1</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="4f99d646-1584-4429-95b2-bba50e39866e">
+      <ItemAddTime>639107389063765933</ItemAddTime>
+      <ItemAddTimeCount>2</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="e0c87109-80de-4148-8fad-da6555db2052">
+      <ItemAddTime>639107389063765933</ItemAddTime>
+      <ItemAddTimeCount>3</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="d59dc681-31d0-4d1c-9a69-eee22d108a1f">
+      <ItemAddTime>639107389063765933</ItemAddTime>
+      <ItemAddTimeCount>4</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="86d29938-945f-41c8-9b80-544e5394b354">
+      <ItemAddTime>639107389063765933</ItemAddTime>
+      <ItemAddTimeCount>5</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="eb76444c-38b8-4197-94ce-5f69dbce8cdd">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="8dea7f4c-9c75-4164-9fbf-294d44a606bb">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>1</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="c8313583-7dd6-46e9-8a4c-cd227a516875">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>2</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="e3fe042b-3f9b-4be7-89f1-351c197e710d">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>3</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="99d33771-9933-446e-9a40-7a37d332660a">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>4</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="a9625d48-b7f6-4457-8019-e5a89c4b7562">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>5</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="be97daf1-a4f8-4af2-8577-1fbd64a9551d">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>6</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="557642b8-8e30-4272-89c8-950b28c79a7b">
+      <ItemAddTime>639107389063855925</ItemAddTime>
+      <ItemAddTimeCount>7</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="69c906aa-69c6-4dd9-bd60-3961b57d3d62">
+      <ItemAddTime>639107389063916007</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="71ccd29c-5eff-4502-aa98-610b1c322231">
+      <ItemAddTime>639107389063916007</ItemAddTime>
+      <ItemAddTimeCount>1</ItemAddTimeCount>
+    </Instance>
     <Instance Guid="2317529b-91c1-49b6-8351-6d8f51718b0d">
       <TimeTagModified-SourceItem0--0>-8586317059478255625</TimeTagModified-SourceItem0--0>
       <SourceItem0-IsLockedByUser>False</SourceItem0-IsLockedByUser>
@@ -5264,6 +5529,38 @@ cl0rle.lib
       <SourceItem145-IsLockedByUser>False</SourceItem145-IsLockedByUser>
       <SourceItem145-BuildingTarget-0>True</SourceItem145-BuildingTarget-0>
       <SourceItem145-IndividualCompileOption-0>False</SourceItem145-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem146--0>-8584264971791009875</TimeTagModified-SourceItem146--0>
+      <SourceItem146-IsLockedByUser>False</SourceItem146-IsLockedByUser>
+      <SourceItem146-BuildingTarget-0>True</SourceItem146-BuildingTarget-0>
+      <SourceItem146-IndividualCompileOption-0>False</SourceItem146-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem147--0>-8584264971790999869</TimeTagModified-SourceItem147--0>
+      <SourceItem147-IsLockedByUser>False</SourceItem147-IsLockedByUser>
+      <SourceItem147-BuildingTarget-0>True</SourceItem147-BuildingTarget-0>
+      <SourceItem147-IndividualCompileOption-0>False</SourceItem147-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem148--0>-8584264971790999869</TimeTagModified-SourceItem148--0>
+      <SourceItem148-IsLockedByUser>False</SourceItem148-IsLockedByUser>
+      <SourceItem148-BuildingTarget-0>True</SourceItem148-BuildingTarget-0>
+      <SourceItem148-IndividualCompileOption-0>False</SourceItem148-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem149--0>-8584264971790919883</TimeTagModified-SourceItem149--0>
+      <SourceItem149-IsLockedByUser>False</SourceItem149-IsLockedByUser>
+      <SourceItem149-BuildingTarget-0>True</SourceItem149-BuildingTarget-0>
+      <SourceItem149-IndividualCompileOption-0>False</SourceItem149-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem150--0>-8584264971790919883</TimeTagModified-SourceItem150--0>
+      <SourceItem150-IsLockedByUser>False</SourceItem150-IsLockedByUser>
+      <SourceItem150-BuildingTarget-0>True</SourceItem150-BuildingTarget-0>
+      <SourceItem150-IndividualCompileOption-0>False</SourceItem150-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem151--0>-8584264971790909883</TimeTagModified-SourceItem151--0>
+      <SourceItem151-IsLockedByUser>False</SourceItem151-IsLockedByUser>
+      <SourceItem151-BuildingTarget-0>True</SourceItem151-BuildingTarget-0>
+      <SourceItem151-IndividualCompileOption-0>False</SourceItem151-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem152--0>-8584264971790909883</TimeTagModified-SourceItem152--0>
+      <SourceItem152-IsLockedByUser>False</SourceItem152-IsLockedByUser>
+      <SourceItem152-BuildingTarget-0>True</SourceItem152-BuildingTarget-0>
+      <SourceItem152-IndividualCompileOption-0>False</SourceItem152-IndividualCompileOption-0>
+      <TimeTagModified-SourceItem153--0>-8584264971790859801</TimeTagModified-SourceItem153--0>
+      <SourceItem153-IsLockedByUser>False</SourceItem153-IsLockedByUser>
+      <SourceItem153-BuildingTarget-0>True</SourceItem153-BuildingTarget-0>
+      <SourceItem153-IndividualCompileOption-0>False</SourceItem153-IndividualCompileOption-0>
     </Instance>
   </Class>
   <Class Guid="44fa27c9-0aa0-4297-bd3b-2c5c5bdb8881">

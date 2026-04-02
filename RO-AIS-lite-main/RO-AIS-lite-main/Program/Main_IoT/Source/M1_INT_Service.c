@@ -39,6 +39,8 @@
 #include    "Global_Variable.h"
 #include    "Port_Define.h"
 #include    "M1_INT_Service.h"
+#include    "hal_serial.h"
+#include    "eeprom_iica0_drv.h"
 /***********************************************************************************************************************/
 
 
@@ -95,7 +97,7 @@ __interrupt void INTTM02 ( void ) /* 500us */
         /*2ms*/
         u8MotorCnt_2ms = 0;
 
-        /*..hui [17-11-30¿ÀÀü 11:23:00] Select Bar ½ºÅÜ¸ðÅÍ..*/
+        /*..hui [17-11-30ï¿½ï¿½ï¿½ï¿½ 11:23:00] Select Bar ï¿½ï¿½ï¿½Ü¸ï¿½ï¿½ï¿½..*/
         //motor_select_bar_output();
     }
     else{}
@@ -105,7 +107,7 @@ __interrupt void INTTM02 ( void ) /* 500us */
         /*3ms*/
         u8MotorCnt_3ms = 0;
 
-        /*..hui [17-11-30¿ÀÀü 11:23:40] Door ½ºÅÜ ¸ðÅÍ..*/
+        /*..hui [17-11-30ï¿½ï¿½ï¿½ï¿½ 11:23:40] Door ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½..*/
         motor_ice_door_output();
     }
     else{}
@@ -115,7 +117,7 @@ __interrupt void INTTM02 ( void ) /* 500us */
         /*3ms*/
         u8MotorCnt_30ms = 0;
 
-        /*..hui [19-7-24¿ÀÀü 11:21:59] ³Ã¸ÅÀüÈ¯¹ëºê..*/
+        /*..hui [19-7-24ï¿½ï¿½ï¿½ï¿½ 11:21:59] ï¿½Ã¸ï¿½ï¿½ï¿½È¯ï¿½ï¿½ï¿½..*/
         StepMotorTimerInterrupt();
     }
     else{}
@@ -148,7 +150,7 @@ __interrupt void INTTM11 ( void )
 __interrupt void INTP7 (void)
 {
     //
-    /*..hui [19-7-17¿ÀÈÄ 3:24:58] À¯·®¼¾¼­..*/
+    /*..hui [19-7-17ï¿½ï¿½ï¿½ï¿½ 3:24:58] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½..*/
     INTP7_Flow_Sensor_Input();
 }
 
@@ -359,7 +361,8 @@ __interrupt void INTST3 (void)
     }
     #endif
 
-    int_UART3_AT_TX();
+    // int_UART3_AT_TX();
+    HAL_Uart3_Interrupt_Send();
 }
 
 /***********************************************************************************************************************
@@ -380,7 +383,8 @@ __interrupt void INTSR3 (void)
     }
     #endif
 
-    int_UART3_AT_RX();
+    // int_UART3_AT_RX();
+    HAL_Uart3_Interrupt_Receive();
 }
 
 /***********************************************************************************************************************
@@ -427,7 +431,7 @@ __interrupt static void INTIICA0(void)
 {
     if ((IICS0 & 0x80) == 0x80)
     {
-        iica0_master_handler();
+        user_iica0_master_handler();
     }
     else{}
 }

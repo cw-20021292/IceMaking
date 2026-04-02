@@ -11,7 +11,7 @@
 
 extern void eeprom_write_cycle_time(void);
 extern void Delay_MS( U16 ms );
-
+void user_iica0_master_handler(void);
 
 /* Status list definition */
 #define MD_STATUSBASE        (0x00U)
