@@ -104,8 +104,8 @@ extern bit F_IR;
 extern U32 gu32_wifi_ice_heater_time;
 
 /*..hui [20-10-14���� 4:14:19] �������� ���濡 ���� ����..*/
-// #define C_ICE_TRAY_FILL_200CC          1010
-#define C_ICE_TRAY_FILL_200CC          810      // 기존대비 80% 감소
+#define C_ICE_TRAY_FILL_200CC          1010
+// #define C_ICE_TRAY_FILL_200CC          810      // 기존대비 80% 감소
 
 
 #define ICE_MAKE_TIME     899                        /* �ܱ� 25'C, �ü� �µ� 25'C ���� */

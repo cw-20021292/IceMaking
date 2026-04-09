@@ -12,6 +12,7 @@
 #include    "M0_System_init.h"
 #include	"WIFI_Config.h"
 #include    "api_uart.h"
+#include    "api_debug.h"
 
 void System_ini(void);
 void Ram_Init(void);
@@ -56,6 +57,8 @@ void System_ini(void)
     Variable_Init();
 
     Uart_Init();
+
+    dlog(SYSMOD, INFO, ("CLI - System Start \r\n") );
 }
 
 /***********************************************************************************************************************

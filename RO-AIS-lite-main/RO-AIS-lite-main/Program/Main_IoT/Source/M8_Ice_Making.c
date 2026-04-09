@@ -309,8 +309,8 @@ void ice_make_operation(void)
 
                     ///gu16_wifi_ice_make_time = gu16IceMakeTime;
 
-                    /*..hui [19-7-5���� 2:08:13] 100ms ī��Ʈ ���� ����..*/
-                    gu16IceMakeTime = (U16)(gu16IceMakeTime  * 10);
+                    /* 제빙시간 3배로 진행 */
+                    gu16IceMakeTime = (U16)(gu16IceMakeTime  * 30);
 
                     /*..hui [20-2-19���� 3:32:11] �ڵ� ��� ���� Ż���� 3�� ���Ŀ��� �����ϱ����� �߰�..*/
                     gu16_cody_ice_make_time  = gu16IceMakeTime;
@@ -319,6 +319,7 @@ void ice_make_operation(void)
                     gu16DetectTimer = 0;
                     gu8IsAdcDown = 0;
                     gu8_ice_tray_reovery_time = 0;
+                    dlog(SYSMOD, INFO, ("CLI Test - Ice Make Start \r\n") );
 
                     #if 0
                     /*..hui [20-2-12���� 4:43:37] �¼� ������̸� �¼� ��� �����ϰ� 2�� �� ����..*/
@@ -354,13 +355,26 @@ void ice_make_operation(void)
             }
             else{}
 
-            // if(gu16IceMakeTime == 0)
-            // 기술과제 시침핀 AD값 990 이하로 확인되면 ok
+            /* ADC 990을 한번 찍은 이후 떨어지는 구간 체크를 위해 Flag Set */
+            if(gu16IceMakeTime == 0)
+            {
+                dlog(SYSMOD, INFO, ("CLI Test - Ice is Not Detected.. T.T => %d \r\n", gu16IceMakingADVal) );
+                gu16IceHeaterTime = calc_ice_heater_time();
+                down_tray_motor();
+                F_CristalIce = CLEAR;
+
+                gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
+            }
+            else
+            {
+                recovery_ice_tray();
+            }
+
             if(gu16IceMakingADVal >= 990)
             {
-                dlog(SYSMOD, INFO, ("CLI Test - Ice Deteted : %d \r\n", gu16IceMakingADVal) );
                 gu16DetectTimer++;
                 gu8IsAdcDown = 1;
+                
                 // 6분 연속으로 감지되면 ok
                 // if(gu16DetectTimer >= WORK_ADC_OK_TIME)
                 // {
@@ -370,10 +384,13 @@ void ice_make_operation(void)
             }
             else
             {
-                if(gu16IceMakingADVal <= 200)
+                /* Adc가 올라간 후, Adc가 300이하로 감지되면 제빙완료로 판단 */
+                if(gu16IceMakingADVal <= 620)
                 {
                     if(gu8IsAdcDown == TRUE)
                     {
+                        dlog(SYSMOD, INFO, ("CLI Test - Ice Detected! :) => %d \r\n", gu16IceMakingADVal) );
+                        // dlog(SYSMOD, INFO, ("CLI - Ice Detected! => %d \r\n" ), gu16IceMakingADVal);
                         gu8IsAdcDown = FALSE;
 
                         gu16IceHeaterTime = calc_ice_heater_time();
@@ -387,6 +404,7 @@ void ice_make_operation(void)
                         F_CristalIce = CLEAR;
                     }
                 }
+
                 gu16DetectTimer = 0;
                 recovery_ice_tray();
             }
