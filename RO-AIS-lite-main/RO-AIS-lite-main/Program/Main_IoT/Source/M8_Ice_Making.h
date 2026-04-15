@@ -25,13 +25,6 @@ extern TYPE_BYTE          U8DrainWaterLevelB;
 #define            Bit2_Drain_Water_High                U8DrainWaterLevelB.Bit.b2
 #define            Bit3_Drain_Water_Error                U8DrainWaterLevelB.Bit.b3
 
-
-extern TYPE_BYTE          U8WaterOutStateB;
-#define            u8WaterOutState                           U8WaterOutStateB.byte
-#define            Bit0_Pure_Water_Select_State                U8WaterOutStateB.Bit.b0
-#define            Bit1_Cold_Water_Select_State                 U8WaterOutStateB.Bit.b1
-#define            Bit2_Hot_Water_Select_State                U8WaterOutStateB.Bit.b2
-
 extern TYPE_BYTE          U8MakeModeB;
 #define            gu8_Make_Mode                U8MakeModeB.byte
 #define            Bit0_Cold_Make_Go                U8MakeModeB.Bit.b0
@@ -130,6 +123,16 @@ extern U32 gu32_wifi_ice_make_time;
 
 extern bit bit_self_test_start;
 
+extern U8 Get_IsIceMakeTable(void);
+extern U8 Get_IceMakeTableCount(void);
+extern U8 Get_IsIceMakeAdc(void);
+extern U8 Get_IceMakeAdcCount(void);
+
+#define ICE_MAKE_METHOD_TABLE   1
+#define ICE_MAKE_METHOD_ADC     2
+
+extern void Record_IceMakeComplete(U8 mu8Method);
+extern U8   Get_IceMakeHistory(U8 mu8Index);
 
 
 

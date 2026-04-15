@@ -119,6 +119,40 @@ extern U16 gu16IceMakingADVal;
 U16 gu16DetectTimer = 0;
 U8 gu8IsAdcDown = 0;
 
+typedef struct
+{
+    U8 gu8IsIceMakeTable;
+    U8 gu8IceMakeTableCount;
+    U8 gu8IsIceMakeAdc;
+    U8 gu8IceMakeAdcCount;
+} Working_t;
+Working_t Work;
+
+U8 Get_IsIceMakeTable(void)     { return Work.gu8IsIceMakeTable; }
+U8 Get_IceMakeTableCount(void)  { return Work.gu8IceMakeTableCount; }
+U8 Get_IsIceMakeAdc(void)       { return Work.gu8IsIceMakeAdc; }
+U8 Get_IceMakeAdcCount(void)    { return Work.gu8IceMakeAdcCount; }
+
+/* 최근 3회 제빙완료 방법 이력 (0=없음, 1=시간완료, 2=ADC완료) */
+/* [0]=1회전, [1]=2회전, [2]=3회전 */
+U8 gu8IceMakeHistory[3] = {0, 0, 0};
+
+void Record_IceMakeComplete(U8 mu8Method)
+{
+    gu8IceMakeHistory[2] = gu8IceMakeHistory[1];
+    gu8IceMakeHistory[1] = gu8IceMakeHistory[0];
+    gu8IceMakeHistory[0] = mu8Method;
+}
+
+U8 Get_IceMakeHistory(U8 mu8Index)
+{
+    if(mu8Index >= 3)
+    {
+        return 0;
+    }
+    return gu8IceMakeHistory[mu8Index];
+}
+
 /***********************************************************************************************************************
 * Function Name: System_ini
 * Description  :
@@ -310,7 +344,7 @@ void ice_make_operation(void)
                     ///gu16_wifi_ice_make_time = gu16IceMakeTime;
 
                     /* 제빙시간 3배로 진행 */
-                    gu16IceMakeTime = (U16)(gu16IceMakeTime  * 30);
+                    gu16IceMakeTime = (U16)(gu16IceMakeTime  * 20);
 
                     /*..hui [20-2-19���� 3:32:11] �ڵ� ��� ���� Ż���� 3�� ���Ŀ��� �����ϱ����� �߰�..*/
                     gu16_cody_ice_make_time  = gu16IceMakeTime;
@@ -358,10 +392,13 @@ void ice_make_operation(void)
             /* ADC 990을 한번 찍은 이후 떨어지는 구간 체크를 위해 Flag Set */
             if(gu16IceMakeTime == 0)
             {
+                /* Cursor : 제빙시간으로 제빙됐을 때 1 */
                 dlog(SYSMOD, INFO, ("CLI Test - Ice is Not Detected.. T.T => %d \r\n", gu16IceMakingADVal) );
                 gu16IceHeaterTime = calc_ice_heater_time();
                 down_tray_motor();
                 F_CristalIce = CLEAR;
+
+                Record_IceMakeComplete(ICE_MAKE_METHOD_TABLE);
 
                 gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
             }
@@ -370,10 +407,15 @@ void ice_make_operation(void)
                 recovery_ice_tray();
             }
 
-            if(gu16IceMakingADVal >= 990)
+            if(gu16IceMakingADVal >= 830)
             {
                 gu16DetectTimer++;
-                gu8IsAdcDown = 1;
+
+                if(gu8IsAdcDown == 0)
+                {
+                    dlog(SYSMOD, INFO, ("CLI Test - 1Step Ice Detected! :) => %d \r\n", gu16IceMakingADVal) );
+                    gu8IsAdcDown = 1;
+                }
                 
                 // 6분 연속으로 감지되면 ok
                 // if(gu16DetectTimer >= WORK_ADC_OK_TIME)
@@ -387,9 +429,10 @@ void ice_make_operation(void)
                 /* Adc가 올라간 후, Adc가 300이하로 감지되면 제빙완료로 판단 */
                 if(gu16IceMakingADVal <= 620)
                 {
+                    /* Cursor : ADC로 제빙됐을 때 2 */
                     if(gu8IsAdcDown == TRUE)
                     {
-                        dlog(SYSMOD, INFO, ("CLI Test - Ice Detected! :) => %d \r\n", gu16IceMakingADVal) );
+                        dlog(SYSMOD, INFO, ("CLI Test - 2Step Ice Detected! :) => %d \r\n", gu16IceMakingADVal) );
                         // dlog(SYSMOD, INFO, ("CLI - Ice Detected! => %d \r\n" ), gu16IceMakingADVal);
                         gu8IsAdcDown = FALSE;
 
@@ -398,6 +441,8 @@ void ice_make_operation(void)
                         /*F_IceHeater = SET;*/                      // Ice Heater On
 
                         down_tray_motor();
+
+                        Record_IceMakeComplete(ICE_MAKE_METHOD_ADC);
 
                         gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
 
