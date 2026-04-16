@@ -121,17 +121,12 @@ U8 gu8IsAdcDown = 0;
 
 typedef struct
 {
-    U8 gu8IsIceMakeTable;
-    U8 gu8IceMakeTableCount;
-    U8 gu8IsIceMakeAdc;
-    U8 gu8IceMakeAdcCount;
+    U16 gu16TimingAdcValue;       /* 제빙시간으로 완료되었을 때 ADC값 */
+    U16 gu16IceMakingMaxValue;    /* 측정된 최대 ADC값 */
+    U16 gu16IceMakingMinValue;    /* 측정된 최소 ADC값 */
 } Working_t;
 Working_t Work;
 
-U8 Get_IsIceMakeTable(void)     { return Work.gu8IsIceMakeTable; }
-U8 Get_IceMakeTableCount(void)  { return Work.gu8IceMakeTableCount; }
-U8 Get_IsIceMakeAdc(void)       { return Work.gu8IsIceMakeAdc; }
-U8 Get_IceMakeAdcCount(void)    { return Work.gu8IceMakeAdcCount; }
 
 /* 최근 3회 제빙완료 방법 이력 (0=없음, 1=시간완료, 2=ADC완료) */
 /* [0]=1회전, [1]=2회전, [2]=3회전 */
@@ -353,6 +348,9 @@ void ice_make_operation(void)
                     gu16DetectTimer = 0;
                     gu8IsAdcDown = 0;
                     gu8_ice_tray_reovery_time = 0;
+                    Work.gu16IceMakingMaxValue = 0;
+                    Work.gu16IceMakingMinValue = 0xFFFF;
+
                     dlog(SYSMOD, INFO, ("CLI Test - Ice Make Start \r\n") );
 
                     #if 0
@@ -380,7 +378,6 @@ void ice_make_operation(void)
             break;
         //-----------------------------------------------// �����Ϸ��� ����ȸ��
         case STATE_31_MAIN_ICE_MAKING :
-
             if(gu16IceMakeTime > 0 && pCOMP == SET)
             {
                 gu16IceMakeTime--;    // ���� 13��
@@ -389,70 +386,76 @@ void ice_make_operation(void)
             }
             else{}
 
-            /* ADC 990을 한번 찍은 이후 떨어지는 구간 체크를 위해 Flag Set */
-            if(gu16IceMakeTime == 0)
+            if(Work.gu16TimingAdcValue > 0)
             {
-                /* Cursor : 제빙시간으로 제빙됐을 때 1 */
-                dlog(SYSMOD, INFO, ("CLI Test - Ice is Not Detected.. T.T => %d \r\n", gu16IceMakingADVal) );
-                gu16IceHeaterTime = calc_ice_heater_time();
-                down_tray_motor();
-                F_CristalIce = CLEAR;
-
-                Record_IceMakeComplete(ICE_MAKE_METHOD_TABLE);
-
-                gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
-            }
-            else
-            {
-                recovery_ice_tray();
-            }
-
-            if(gu16IceMakingADVal >= 830)
-            {
-                gu16DetectTimer++;
-
-                if(gu8IsAdcDown == 0)
+                // 우선 제빙중 ADC 최대값 (Adc값 - 보정값)을 기준으로 제빙 - 안정화
+                if(gu16IceMakingADVal >= (Work.gu16IceMakingMaxValue - ICE_THRESHOLD_VAL))
                 {
-                    dlog(SYSMOD, INFO, ("CLI Test - 1Step Ice Detected! :) => %d \r\n", gu16IceMakingADVal) );
-                    gu8IsAdcDown = 1;
-                }
-                
-                // 6분 연속으로 감지되면 ok
-                // if(gu16DetectTimer >= WORK_ADC_OK_TIME)
-                // {
-                //     gu16DetectTimer = WORK_ADC_OK_TIME;
-                //     dlog(SYSMOD, INFO, ("CLI Test - Ice Complete : %d \r\n", 2) );
-                // }
-            }
-            else
-            {
-                /* Adc가 올라간 후, Adc가 300이하로 감지되면 제빙완료로 판단 */
-                if(gu16IceMakingADVal <= 620)
-                {
-                    /* Cursor : ADC로 제빙됐을 때 2 */
-                    if(gu8IsAdcDown == TRUE)
+                    if(gu8IsAdcDown == 0)
                     {
-                        dlog(SYSMOD, INFO, ("CLI Test - 2Step Ice Detected! :) => %d \r\n", gu16IceMakingADVal) );
-                        // dlog(SYSMOD, INFO, ("CLI - Ice Detected! => %d \r\n" ), gu16IceMakingADVal);
-                        gu8IsAdcDown = FALSE;
-
-                        gu16IceHeaterTime = calc_ice_heater_time();
-
-                        /*F_IceHeater = SET;*/                      // Ice Heater On
-
-                        down_tray_motor();
-
-                        Record_IceMakeComplete(ICE_MAKE_METHOD_ADC);
-
-                        gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
-
-                        F_CristalIce = CLEAR;
+                        dlog(SYSMOD, INFO, ("CLI - Meet 1Step Standard for Making Ice with Adc => %d \r\n", gu16IceMakingADVal) );
+                        gu8IsAdcDown = 1;
                     }
                 }
+                else
+                {
+                    // 우선 제빙이 완료된 시점의 (Adc값 + 보정값)을 기준으로 제빙 - 안정화
+                    if(gu16IceMakingADVal <= (Work.gu16TimingAdcValue + ICE_THRESHOLD_VAL))
+                    {
+                        /* Cursor : ADC로 제빙됐을 때 2 */
+                        if(gu8IsAdcDown == TRUE)
+                        {
+                            dlog(SYSMOD, INFO, ("CLI - Complete Making Ice with Adc => %d \r\n", gu16IceMakingADVal) );
+                            gu8IsAdcDown = FALSE;
+                            gu16IceHeaterTime = calc_ice_heater_time();
+                            down_tray_motor();
+                            Record_IceMakeComplete(ICE_MAKE_METHOD_ADC);
+                            gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
+                            F_CristalIce = CLEAR;
+                        }
+                    }
 
-                gu16DetectTimer = 0;
-                recovery_ice_tray();
+                    gu16DetectTimer = 0;
+                    recovery_ice_tray();
+                }
             }
+            else
+            {
+                /* 최대값 백업 */
+                if(Work.gu16IceMakingMaxValue < gu16IceMakingADVal)
+                {
+                    Work.gu16IceMakingMaxValue = gu16IceMakingADVal;
+                }
+
+                /* 최소값 백업 */
+                if(Work.gu16IceMakingMinValue > gu16IceMakingADVal)
+                {
+                    Work.gu16IceMakingMinValue = gu16IceMakingADVal;
+                }
+
+                if(gu16IceMakeTime == 0)
+                {
+                    Work.gu16TimingAdcValue = gu16IceMakingADVal;
+
+                    /* Cursor : 제빙시간으로 제빙됐을 때 1 */
+                    dlog(SYSMOD, INFO, ("CLI - Making Ice with Time. Adc[Std] Val => %d \r\n", Work.gu16TimingAdcValue));
+                    dlog(SYSMOD, INFO, ("CLI - Making Ice with Time. Adc[Max] Val => %d \r\n", Work.gu16IceMakingMaxValue));
+                    dlog(SYSMOD, INFO, ("CLI - Making Ice with Time. Adc[Min] Val => %d \r\n", Work.gu16IceMakingMinValue));
+                    gu16IceHeaterTime = calc_ice_heater_time();
+                    down_tray_motor();
+                    F_CristalIce = CLEAR;
+
+                    Record_IceMakeComplete(ICE_MAKE_METHOD_TABLE);
+
+                    gu8IceStep = STATE_40_ICE_TRAY_MOVE_DOWN;
+                }
+                else
+                {
+                    recovery_ice_tray();
+                }
+            }
+
+
 
             break;
 

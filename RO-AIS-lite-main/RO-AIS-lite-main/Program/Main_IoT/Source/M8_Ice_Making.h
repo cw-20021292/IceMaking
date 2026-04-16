@@ -123,13 +123,10 @@ extern U32 gu32_wifi_ice_make_time;
 
 extern bit bit_self_test_start;
 
-extern U8 Get_IsIceMakeTable(void);
-extern U8 Get_IceMakeTableCount(void);
-extern U8 Get_IsIceMakeAdc(void);
-extern U8 Get_IceMakeAdcCount(void);
-
 #define ICE_MAKE_METHOD_TABLE   1
 #define ICE_MAKE_METHOD_ADC     2
+
+#define ICE_THRESHOLD_VAL       50
 
 extern void Record_IceMakeComplete(U8 mu8Method);
 extern U8   Get_IceMakeHistory(U8 mu8Index);
